@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>БОТ</title>
+    <title>Шашки</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,31 +17,31 @@
         }
         #board {
             display: grid;
-            grid-template-columns: repeat(8, 50px);
-            grid-template-rows: repeat(8, 50px);
-            gap: 2px;
+            grid-template-columns: repeat(8, 60px);
+            grid-template-rows: repeat(8, 60px);
+            gap: 0;
             margin: 20px auto;
             border: 2px solid #000;
             width: max-content;
-            background-color: #fff;
         }
         .cell {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-        }
-        .dark {
-            background-color: #769656;
+            position: relative;
         }
         .light {
-            background-color: #eeeed2;
+            background-color: #f0d9b5; 
+        }
+        .dark {
+            background-color: #b58863; 
         }
         .piece {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             cursor: pointer;
         }
@@ -49,14 +49,14 @@
             background-color: #000;
         }
         .bot {
-            background-color: #fff;
+            background-color: #fff; 
             border: 2px solid #000;
         }
         .player.king, .bot.king {
-            border: 2px solid gold;
+            border: 3px solid gold;
         }
         .selected {
-            border: 2px solid red;
+            border: 2px solid red; 
         }
         #resetButton {
             margin-top: 20px;
@@ -69,23 +69,105 @@
             font-size: 20px;
             font-weight: bold;
         }
+
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #333;
+            color: #fff;
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+        #sidebar.open {
+            left: 0;
+        }
+        #sidebar ul {
+            list-style: none;
+            padding: 20px;
+        }
+        #sidebar ul li {
+            margin: 20px 0;
+        }
+        #sidebar ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        #menuToggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
+            color: #333;
+        }
     </style>
 </head>
 <body>
-    <h1>Шашки (тут рандом он не умный)</h1>
-    <div id="board"></div>
-    <button id="resetButton">Сбросить игру</button>
-    <div id="message"></div>
+
+    <div id="sidebar">
+        <ul>
+            <li><a href="index.html">Шашки</a></li>
+            <li><a href="pop.html">POP</a></li>            
+        </ul>
+    </div>
+
+
+    <div id="menuToggle">☰</div>
+
+
+    <div id="checkersContent">
+        <h1>Шашки (тут рандом, он не умный)</h1>
+        <div id="board"></div>
+        <button id="resetButton">Сбросить игру</button>
+        <div id="message"></div>
+    </div>
+
+
+    <div id="popContent" style="display: none;">
+        <h1>Страница POP</h1>
+        <p>Добро пожаловать на страницу POP!</p>
+    </div>
 
     <script>
+
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const checkersContent = document.getElementById('checkersContent');
+        const popContent = document.getElementById('popContent');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        document.querySelectorAll('#sidebar a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (link.getAttribute('href') === 'pop.html') {
+                    checkersContent.style.display = 'none';
+                    popContent.style.display = 'block';
+                } else {
+                    checkersContent.style.display = 'block';
+                    popContent.style.display = 'none';
+                }
+                sidebar.classList.remove('open');
+            });
+        });
+
+
         const boardElement = document.getElementById('board');
         const resetButton = document.getElementById('resetButton');
         const messageElement = document.getElementById('message');
         let board = [];
-        let currentPlayer = 'player'; //начинает
-        let selectedPiece = null; //шашка
+        let currentPlayer = 'player';
+        let selectedPiece = null;
 
-        //инициализация доски
+ 
         function initBoard() {
             board = [];
             for (let row = 0; row < 8; row++) {
@@ -93,14 +175,14 @@
                 for (let col = 0; col < 8; col++) {
                     if ((row + col) % 2 === 1) {
                         if (row < 3) {
-                            board[row][col] = { type: 'bot', king: false }; // Шашки бота
+                            board[row][col] = { type: 'bot', king: false };
                         } else if (row > 4) {
-                            board[row][col] = { type: 'player', king: false }; // Шашки игрока
+                            board[row][col] = { type: 'player', king: false };
                         } else {
-                            board[row][col] = null; // Пустая клетка
+                            board[row][col] = null;
                         }
                     } else {
-                        board[row][col] = null; // Пустая клетка
+                        board[row][col] = null;
                     }
                 }
             }
@@ -108,7 +190,6 @@
             messageElement.textContent = '';
         }
 
-        //отрисовка доски
         function renderBoard() {
             boardElement.innerHTML = '';
             for (let row = 0; row < 8; row++) {
@@ -138,20 +219,19 @@
             }
         }
 
-        //обработка клика клетке
+
         function handleCellClick(row, col) {
             if (currentPlayer === 'player') {
                 if (selectedPiece) {
-                    // Попытка сделать ход
                     if (isValidMove(selectedPiece.row, selectedPiece.col, row, col)) {
                         movePiece(selectedPiece.row, selectedPiece.col, row, col);
                         selectedPiece = null;
                         if (!checkWin()) {
                             currentPlayer = 'bot';
-                            setTimeout(botMove, 500); //бот делает ход
+                            setTimeout(botMove, 500);
                         }
                     } else {
-                        selectedPiece = null; 
+                        selectedPiece = null;
                     }
                     renderBoard();
                 } else if (board[row][col] && board[row][col].type === 'player') {
@@ -160,8 +240,6 @@
                 }
             }
         }
-
-        //проверка хода
         function isValidMove(fromRow, fromCol, toRow, toCol) {
             const piece = board[fromRow][fromCol];
             if (!piece) return false;
@@ -169,18 +247,15 @@
             const rowDiff = toRow - fromRow;
             const colDiff = toCol - fromCol;
 
-            //проверка направления хода
             if (!piece.king) {
-                if (piece.type === 'player' && rowDiff >= 0) return false; 
-                if (piece.type === 'bot' && rowDiff <= 0) return false; 
+                if (piece.type === 'player' && rowDiff >= 0) return false;
+                if (piece.type === 'bot' && rowDiff <= 0) return false;
             }
 
-            //ход на клетку
             if (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 1) {
                 return board[toRow][toCol] === null;
             }
 
-            //ход с убиванием шашки
             if (Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 2) {
                 const midRow = (fromRow + toRow) / 2;
                 const midCol = (fromCol + toCol) / 2;
@@ -190,7 +265,6 @@
                 }
             }
 
-            //ход дамкой 
             if (piece.king && Math.abs(rowDiff) === Math.abs(colDiff)) {
                 let stepRow = rowDiff > 0 ? 1 : -1;
                 let stepCol = colDiff > 0 ? 1 : -1;
@@ -214,21 +288,17 @@
 
             return false;
         }
-
-        //логика хода
         function movePiece(fromRow, fromCol, toRow, toCol) {
             const piece = board[fromRow][fromCol];
             const rowDiff = toRow - fromRow;
             const colDiff = toCol - fromCol;
 
-            //ход с шашкой
             if (Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 2) {
                 const midRow = (fromRow + toRow) / 2;
                 const midCol = (fromCol + toCol) / 2;
                 board[midRow][midCol] = null;
             }
 
-            //ход дамкой
             if (piece.king && Math.abs(rowDiff) === Math.abs(colDiff)) {
                 let stepRow = rowDiff > 0 ? 1 : -1;
                 let stepCol = colDiff > 0 ? 1 : -1;
@@ -237,18 +307,16 @@
 
                 while (currentRow !== toRow || currentCol !== toCol) {
                     if (board[currentRow][currentCol]) {
-                        board[currentRow][currentCol] = null; 
+                        board[currentRow][currentCol] = null;
                     }
                     currentRow += stepRow;
                     currentCol += stepCol;
                 }
             }
 
-            //перемещение шашки
             board[toRow][toCol] = piece;
             board[fromRow][fromCol] = null;
 
-            //превращение в дамку
             if (!piece.king) {
                 if ((piece.type === 'player' && toRow === 0) || (piece.type === 'bot' && toRow === 7)) {
                     piece.king = true;
@@ -258,7 +326,6 @@
             renderBoard();
         }
 
-        //логика хода бота
         function botMove() {
             const botPieces = [];
             for (let row = 0; row < 8; row++) {
@@ -269,7 +336,6 @@
                 }
             }
 
-            //поиск возможных ходов
             for (const piece of botPieces) {
                 const moves = [
                     { row: piece.row + 2, col: piece.col + 2 },
@@ -288,7 +354,6 @@
                 }
             }
 
-            //случайный ход 
             for (const piece of botPieces) {
                 const moves = [
                     { row: piece.row + 1, col: piece.col + 1 },
@@ -308,7 +373,6 @@
             }
         }
 
-        //проверка победы
         function checkWin() {
             let playerPieces = 0;
             let botPieces = 0;
@@ -321,17 +385,6 @@
                 }
             }
 
-            // осталась одна шашка
-            if (playerPieces === 1) {
-                messageElement.textContent = 'Вы проиграли! У вас осталась одна шашка.';
-                return true;
-            }
-            if (botPieces === 1) {
-                messageElement.textContent = 'Вы выиграли! У бота осталась одна шашка.';
-                return true;
-            }
-
-            //не осталось шашек
             if (playerPieces === 0) {
                 messageElement.textContent = 'Бот выиграл!';
                 return true;
@@ -343,15 +396,11 @@
 
             return false;
         }
-
-        //сброс 
         resetButton.addEventListener('click', () => {
             initBoard();
             currentPlayer = 'player';
             selectedPiece = null;
         });
-
-        //запуск 
         initBoard();
     </script>
 </body>
