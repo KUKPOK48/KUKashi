@@ -421,10 +421,12 @@
 
             if (playerPieces === 0) {
                 messageElement.textContent = 'Бот выиграл!';
+                setTimeout(initBoard, 5000);
                 return true;
             }
             if (botPieces === 0) {
                 messageElement.textContent = 'Вы выиграли!';
+                setTimeout(initBoard, 5000); 
                 return true;
             }
 
