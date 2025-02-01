@@ -14,19 +14,20 @@
         }
         h1 {
             margin-top: 20px;
+            font-size: 24px;
         }
         #board {
             display: grid;
-            grid-template-columns: repeat(8, 60px);
-            grid-template-rows: repeat(8, 60px);
+            grid-template-columns: repeat(8, 40px);
+            grid-template-rows: repeat(8, 40px);
             gap: 0;
             margin: 20px auto;
             border: 2px solid #000;
             width: max-content;
         }
         .cell {
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -40,8 +41,8 @@
             background-color: #b58863; 
         }
         .piece {
-            width: 50px;
-            height: 50px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             cursor: pointer;
         }
@@ -63,6 +64,10 @@
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
         }
         #message {
             margin-top: 20px;
@@ -70,6 +75,7 @@
             font-weight: bold;
         }
 
+       
         #sidebar {
             position: fixed;
             top: 0;
@@ -98,6 +104,7 @@
             cursor: pointer;
         }
 
+        
         #menuToggle {
             position: fixed;
             top: 20px;
@@ -107,10 +114,37 @@
             z-index: 1001;
             color: #333;
         }
+
+        /* Адаптация для мобильных устройств */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 20px;
+            }
+            #board {
+                grid-template-columns: repeat(8, 30px);
+                grid-template-rows: repeat(8, 30px);
+            }
+            .cell {
+                width: 30px;
+                height: 30px;
+            }
+            .piece {
+                width: 20px;
+                height: 20px;
+            }
+            #resetButton {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            #message {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 <body>
 
+    
     <div id="sidebar">
         <ul>
             <li><a href="index.html">Шашки</a></li>
@@ -118,10 +152,10 @@
         </ul>
     </div>
 
-
+    
     <div id="menuToggle">☰</div>
 
-
+  
     <div id="checkersContent">
         <h1>Шашки (тут рандом, он не умный)</h1>
         <div id="board"></div>
@@ -136,7 +170,6 @@
     </div>
 
     <script>
-
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.getElementById('menuToggle');
         const checkersContent = document.getElementById('checkersContent');
@@ -159,7 +192,6 @@
             });
         });
 
-
         const boardElement = document.getElementById('board');
         const resetButton = document.getElementById('resetButton');
         const messageElement = document.getElementById('message');
@@ -167,7 +199,6 @@
         let currentPlayer = 'player';
         let selectedPiece = null;
 
- 
         function initBoard() {
             board = [];
             for (let row = 0; row < 8; row++) {
@@ -219,7 +250,6 @@
             }
         }
 
-
         function handleCellClick(row, col) {
             if (currentPlayer === 'player') {
                 if (selectedPiece) {
@@ -240,6 +270,7 @@
                 }
             }
         }
+
         function isValidMove(fromRow, fromCol, toRow, toCol) {
             const piece = board[fromRow][fromCol];
             if (!piece) return false;
@@ -288,6 +319,7 @@
 
             return false;
         }
+
         function movePiece(fromRow, fromCol, toRow, toCol) {
             const piece = board[fromRow][fromCol];
             const rowDiff = toRow - fromRow;
@@ -325,6 +357,7 @@
 
             renderBoard();
         }
+
 
         function botMove() {
             const botPieces = [];
@@ -373,6 +406,7 @@
             }
         }
 
+
         function checkWin() {
             let playerPieces = 0;
             let botPieces = 0;
@@ -396,11 +430,15 @@
 
             return false;
         }
+
+
         resetButton.addEventListener('click', () => {
             initBoard();
             currentPlayer = 'player';
             selectedPiece = null;
         });
+
+    
         initBoard();
     </script>
 </body>
